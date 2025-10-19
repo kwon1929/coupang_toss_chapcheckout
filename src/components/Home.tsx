@@ -12,7 +12,7 @@ const categories = [
 const products = [
   {
     id: 1,
-    name: '라이언플 메모재료 건식렛음 200g',
+    name: '곰곰 삼각김밥 참치마요 (냉장) 120g',
     originalPrice: 3000,
     discountPrice: 1900,
     discountRate: 36,
@@ -22,7 +22,7 @@ const products = [
   },
   {
     id: 2,
-    name: '백설 삼겹살용 모나프랜',
+    name: '백설 고소한 참기름 500ml',
     originalPrice: 32000,
     discountPrice: 19900,
     discountRate: 50,
@@ -72,9 +72,9 @@ export function Home() {
         <div className="absolute bottom-4 right-8 text-3xl">🍋</div>
         <div className="absolute top-1/2 right-12 text-2xl">🥕</div>
         <div className="relative">
-          <p className="text-sm text-gray-700 mb-1">신선 담아도 한 무거워!</p>
+          <p className="text-sm text-gray-700 mb-1">신선식품 아무리 담아도 무료배송!</p>
           <p className="text-orange-500 mb-1">
-            <span className="text-2xl">국민템 최대 50%</span>
+            <span className="text-2xl font-bold">국민템 최대 50%</span>
             <span className="ml-1">할인</span>
           </p>
         </div>
@@ -98,8 +98,8 @@ export function Home() {
       {/* Dyson Banner */}
       <div className="mx-4 mb-6 bg-yellow-300 rounded-xl p-4 flex items-center justify-between">
         <div>
-          <p className="text-sm mb-1">dyson</p>
-          <p className="mb-1">년냥기 50% 무무등</p>
+          <p className="text-sm mb-1 font-semibold">dyson</p>
+          <p className="mb-1 font-bold">청소기 50% 할인특가</p>
         </div>
         <ChevronRight className="w-5 h-5" />
       </div>
@@ -107,8 +107,8 @@ export function Home() {
       {/* Coupang Play Banner */}
       <div className="mx-4 mb-6 bg-gradient-to-r from-blue-400 to-cyan-300 rounded-xl p-4 flex items-center justify-between text-white">
         <div>
-          <p className="text-xs mb-1">coupang play</p>
-          <p>넷실기 무료체럄!</p>
+          <p className="text-xs mb-1 font-semibold">coupang play</p>
+          <p className="font-bold">첫달 무료체험!</p>
         </div>
         <ChevronRight className="w-5 h-5" />
       </div>

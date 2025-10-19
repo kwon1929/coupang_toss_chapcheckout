@@ -1,10 +1,12 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from './ui/dialog';
 import { Button } from './ui/button';
 import { RadioGroup, RadioGroupItem } from './ui/radio-group';
 import { Label } from './ui/label';
-import { CreditCard, Smartphone, Wallet, Check } from 'lucide-react';
+import { Badge } from './ui/badge';
+import { CreditCard, Wallet, Zap, Check } from 'lucide-react';
 import { ImageWithFallback } from './figma/ImageWithFallback';
+import { loadTossPayments } from '@tosspayments/payment-sdk';
 
 interface PaymentDialogProps {
   product: any;
@@ -13,22 +15,57 @@ interface PaymentDialogProps {
 }
 
 export function PaymentDialog({ product, open, onOpenChange }: PaymentDialogProps) {
-  const [paymentMethod, setPaymentMethod] = useState('card');
+  const [paymentMethod, setPaymentMethod] = useState('coupay');
   const [isProcessing, setIsProcessing] = useState(false);
   const [isComplete, setIsComplete] = useState(false);
 
-  const handlePayment = () => {
+  const clientKey = "test_ck_D5GePWvyJnrK0W0k6q8gLzN97Eoq";
+
+  const handlePayment = async () => {
     setIsProcessing(true);
-    
-    setTimeout(() => {
+
+    try {
+      // 퀵계좌이체 선택 시 토스페이먼츠 연동
+      if (paymentMethod === 'quick-transfer') {
+        console.log('퀵계좌이체 결제 시작');
+        const tossPayments = await loadTossPayments(clientKey);
+
+        const paymentData = {
+          amount: product.discountPrice,
+          orderId: `ORDER_${Date.now()}`,
+          orderName: product.name,
+          customerName: '홍길동',
+          successUrl: `${window.location.origin}/payment/success`,
+          failUrl: `${window.location.origin}/payment/fail`,
+        };
+
+        console.log('결제 데이터:', paymentData);
+
+        // 계좌이체 결제 요청
+        await tossPayments.requestPayment('계좌이체', paymentData);
+      } else {
+        // 다른 결제 수단은 기존 로직
+        setTimeout(() => {
+          setIsProcessing(false);
+          setIsComplete(true);
+
+          setTimeout(() => {
+            setIsComplete(false);
+            onOpenChange(false);
+          }, 2000);
+        }, 1500);
+      }
+    } catch (error) {
+      console.error('결제 오류:', error);
       setIsProcessing(false);
-      setIsComplete(true);
-      
-      setTimeout(() => {
-        setIsComplete(false);
-        onOpenChange(false);
-      }, 2000);
-    }, 1500);
+
+      // 사용자가 결제를 취소한 경우
+      if (error instanceof Error && error.message.includes('USER_CANCEL')) {
+        alert('결제가 취소되었습니다.');
+      } else {
+        alert('결제 중 오류가 발생했습니다: ' + (error instanceof Error ? error.message : '알 수 없는 오류'));
+      }
+    }
   };
 
   return (
@@ -58,30 +95,43 @@ export function PaymentDialog({ product, open, onOpenChange }: PaymentDialogProp
 
               {/* Payment Method */}
               <div>
-                <h3 className="mb-3 text-sm">결제 수단</h3>
+                <h3 className="mb-3 text-sm font-semibold">결제 수단</h3>
                 <RadioGroup value={paymentMethod} onValueChange={setPaymentMethod}>
-                  <div className="space-y-2">
-                    <div className="flex items-center space-x-2 border border-gray-200 rounded-lg p-3 hover:border-[#00bac7] cursor-pointer">
+                  <div className="space-y-3">
+                    {/* 쿠페이 */}
+                    <div className="flex items-center space-x-2 border-2 border-gray-200 rounded-lg p-4 hover:border-blue-400 cursor-pointer transition-colors">
+                      <RadioGroupItem value="coupay" id="coupay" />
+                      <Label htmlFor="coupay" className="flex items-center justify-between flex-1 cursor-pointer">
+                        <div className="flex items-center gap-2">
+                          <Wallet className="w-5 h-5 text-blue-600" />
+                          <span className="text-sm font-medium">쿠페이</span>
+                        </div>
+                        <Badge variant="secondary" className="bg-orange-100 text-orange-800 border-orange-200 text-xs px-2 py-0.5 font-semibold">
+                          💰 1% 머니 적립
+                        </Badge>
+                      </Label>
+                    </div>
+
+                    {/* 퀵계좌이체 */}
+                    <div className="flex items-center space-x-2 border-2 border-gray-200 rounded-lg p-4 hover:border-blue-400 cursor-pointer transition-colors">
+                      <RadioGroupItem value="quick-transfer" id="quick-transfer" />
+                      <Label htmlFor="quick-transfer" className="flex items-center justify-between flex-1 cursor-pointer">
+                        <div className="flex items-center gap-2">
+                          <Zap className="w-5 h-5 text-blue-600" />
+                          <span className="text-sm font-medium">퀵계좌이체</span>
+                        </div>
+                        <Badge variant="secondary" className="bg-green-100 text-green-800 border-green-200 text-xs px-2 py-0.5 font-semibold">
+                          등록완료 · 추가등록 불필요
+                        </Badge>
+                      </Label>
+                    </div>
+
+                    {/* 신용카드 */}
+                    <div className="flex items-center space-x-2 border-2 border-gray-200 rounded-lg p-4 hover:border-blue-400 cursor-pointer transition-colors">
                       <RadioGroupItem value="card" id="card" />
                       <Label htmlFor="card" className="flex items-center gap-2 flex-1 cursor-pointer">
-                        <CreditCard className="w-4 h-4 text-gray-600" />
-                        <span className="text-sm">신용/체크카드</span>
-                      </Label>
-                    </div>
-                    
-                    <div className="flex items-center space-x-2 border border-gray-200 rounded-lg p-3 hover:border-[#00bac7] cursor-pointer">
-                      <RadioGroupItem value="phone" id="phone" />
-                      <Label htmlFor="phone" className="flex items-center gap-2 flex-1 cursor-pointer">
-                        <Smartphone className="w-4 h-4 text-gray-600" />
-                        <span className="text-sm">휴대폰 결제</span>
-                      </Label>
-                    </div>
-                    
-                    <div className="flex items-center space-x-2 border border-gray-200 rounded-lg p-3 hover:border-[#00bac7] cursor-pointer">
-                      <RadioGroupItem value="kakao" id="kakao" />
-                      <Label htmlFor="kakao" className="flex items-center gap-2 flex-1 cursor-pointer">
-                        <Wallet className="w-4 h-4 text-gray-600" />
-                        <span className="text-sm">카카오페이</span>
+                        <CreditCard className="w-5 h-5 text-blue-600" />
+                        <span className="text-sm font-medium">신용/체크카드</span>
                       </Label>
                     </div>
                   </div>
@@ -99,8 +149,8 @@ export function PaymentDialog({ product, open, onOpenChange }: PaymentDialogProp
                   <span className="text-green-600">무료</span>
                 </div>
                 <div className="flex justify-between pt-2 border-t border-gray-200">
-                  <span>최종 결제금액</span>
-                  <span className="text-[#ff6b00] text-lg">₩{product.discountPrice.toLocaleString()}</span>
+                  <span className="font-semibold">최종 결제금액</span>
+                  <span className="text-blue-600 text-lg font-bold">₩{product.discountPrice.toLocaleString()}</span>
                 </div>
               </div>
 
@@ -108,15 +158,16 @@ export function PaymentDialog({ product, open, onOpenChange }: PaymentDialogProp
               <Button
                 onClick={handlePayment}
                 disabled={isProcessing}
-                className="w-full bg-[#ff6b00] hover:bg-[#e56000] text-white py-6"
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white py-6 text-lg font-bold shadow-lg border-0"
+                style={{ backgroundColor: '#3b82f6' }}
               >
                 {isProcessing ? (
-                  <span className="flex items-center gap-2">
-                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                    결제 처리 중...
+                  <span className="flex items-center justify-center gap-2">
+                    <div className="w-5 h-5 border-3 border-white border-t-transparent rounded-full animate-spin" />
+                    <span>결제 처리 중...</span>
                   </span>
                 ) : (
-                  `₩${product.discountPrice.toLocaleString()} 결제하기`
+                  <span>₩{product.discountPrice.toLocaleString()} 결제하기</span>
                 )}
               </Button>
             </div>

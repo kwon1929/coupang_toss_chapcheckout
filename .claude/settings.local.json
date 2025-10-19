@@ -5,7 +5,16 @@
       "Bash(npm run dev)",
       "Bash(curl http://localhost:3000)",
       "Bash(git init)",
-      "Bash(git add .)"
+      "Bash(git add .)",
+      "Bash(git commit -m \"$(cat <<''EOF''\nInitial commit: Add GPT-powered AI Shopping Assistant\n\n- Integrate OpenAI GPT-4o-mini API for conversational commerce\n- Implement interactive payment popup with multiple payment methods\n- Add AI shopping assistant with product recommendations\n- Create mobile-first responsive UI with Tailwind CSS\n- Set up product database with skincare, electronics, home, and food categories\n- Include fallback system for offline/no-API-key scenarios\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")",
+      "Bash(git branch -M main)",
+      "Bash(git remote add origin https://github.com/kwon1929/coupang_toss_chapcheckout.git)",
+      "Bash(git push -u origin main)",
+      "Bash(git add .env.example)",
+      "Bash(git commit --amend --no-edit)",
+      "Bash(git push -u origin main --force)",
+      "WebFetch(domain:www.coupang.com)",
+      "Bash(npm install @tosspayments/payment-sdk)"
     ],
     "deny": [],
     "ask": []

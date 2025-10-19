@@ -1,11 +1,32 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Home } from './components/Home';
 import { ChatAssistant } from './components/ChatAssistant';
 import { Cart } from './components/Cart';
+import { PaymentSuccess } from './components/PaymentSuccess';
+import { PaymentFail } from './components/PaymentFail';
 import { Search, Home as HomeIcon, ShoppingCart, MessageCircle } from 'lucide-react';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<'home' | 'chat' | 'cart'>('home');
+  const [currentPage, setCurrentPage] = useState<'main' | 'payment-success' | 'payment-fail'>('main');
+
+  useEffect(() => {
+    // URL 경로 확인
+    const path = window.location.pathname;
+    if (path.includes('/payment/success')) {
+      setCurrentPage('payment-success');
+    } else if (path.includes('/payment/fail')) {
+      setCurrentPage('payment-fail');
+    }
+  }, []);
+
+  if (currentPage === 'payment-success') {
+    return <PaymentSuccess />;
+  }
+
+  if (currentPage === 'payment-fail') {
+    return <PaymentFail />;
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 pb-16">
